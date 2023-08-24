@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume Page</title>
+  <!-- Add your CSS styles here -->
+  <style>
+    /* Add your CSS styles here */
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+    color: #333;
+    font-size: small;
+  }
+
+  h1 {
+    text-align: center;
+    padding: 0;
+    background-color: #fff;
+    color: #ac0202e0;
+    margin: 0;
+  }
+
+  .applicant {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  h3 {
+    margin-top: 0;
+    color: #007BFF;
+  }
+
+  p {
+    margin: 10px 0;
+  }
+
+  ul {
+    padding-left: 20px;
+    margin: 10px 0;
+  }
+
+  li {
+    list-style-type: disc;
+    margin-bottom: 5px;
+  }
+  #prevBtn, #nextBtn, #searchBtn{
+    background-color: #007BFF; 
+    color: #fff; 
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  </style>
+</head>
+<body>
+  <h1>Welcome to the Resume Page</h1>
+  <div id="resumeContainer">
+    <div id="pagination">
+      <button id="prevBtn">Previous</button>
+      <button id="nextBtn">Next</button>
+    </div>
+    <input type="text" id="searchInput" placeholder="Search by job">
+    <button id="searchBtn">Search</button>
+    <p id="searchMessage" class="error-message"></p>
+    <div id="resumeDetails">
+      <!-- Applicant details will be displayed here -->
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      let applicants = [];
+      let currentApplicantIndex = 0;
+
+      const resumeDetails = document.getElementById("resumeDetails");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const searchInput = document.getElementById("searchInput");
+      const searchBtn = document.getElementById("searchBtn");
+      const searchMessage = document.getElementById("searchMessage");
+
+      function displayApplicant(index) {
+        const applicant = applicants[index];
+        resumeDetails.innerHTML = `
+          <h2>${applicant.basics.name}</h2>
+          <p>Applied For: ${applicant.basics.AppliedFor}</p>
+          <p>Email: ${applicant.basics.email}</p>
+          <p>Phone: ${applicant.basics.phone}</p>
+
+          <p>Location:</p>
+          <ul>
+            <li>Address: ${applicant.basics.location.address}</li>
+            <li>City: ${applicant.basics.location.city}</li>
+            <li>State: ${applicant.basics.location.state}</li>
+            <li>Postal Code: ${applicant.basics.location.postalCode}</li>
+         </ul>
+         <p>Profiles:</p>
+        <ul>
+          <li>Network: ${applicant.basics.profiles.network}</li>
+          <li>URL: ${applicant.basics.profiles.url}</li>
+        </ul>
+
+        <h3>Skills:</h3>
+        <p>Name: ${applicant.skills.name}</p>
+        <p>Level: ${applicant.skills.level}</p>
+        <p>Keywords: ${applicant.skills.keywords.join(', ')}</p>
+        
+        <h3>Work:</h3>
+        <p>Company Name: ${applicant.work['Company Name']}</p>
+        <p>Position: ${applicant.work.Position}</p>
+        <p>Start Date: ${applicant.work['Start Date']}</p>
+        <p>End Date: ${applicant.work['End Date']}</p>
+        <p>Summary: ${applicant.work.Summary}</p>
+
+        <h3>Internship:</h3>
+        <p>Company Name: ${applicant.Internship['Company Name']}</p>
+        <p>Position: ${applicant.Internship.Position}</p>
+        <p>Start Date: ${applicant.Internship['Start Date']}</p>
+        <p>End Date: ${applicant.Internship['End Date']}</p>
+        <p>Summary: ${applicant.Internship.Summary}</p>
+        
+        <h3>Projects:</h3>
+        <p>Name: ${applicant.projects.name}</p>
+        <p>Description: ${applicant.projects.description}</p>
+        
+        <h3>Education:</h3>
+        <h4>UG:</h4>
+        <p>Institute: ${applicant.education.UG.institute}</p>
+        <p>Course: ${applicant.education.UG.course}</p>
+        <p>Start Date: ${applicant.education.UG['Start Date']}</p>
+        <p>End Date: ${applicant.education.UG['End Date']}</p>
+        <p>CGPA: ${applicant.education.UG.cgpa}</p>
+        
+        <h4>Senior Secondary:</h4>
+        <p>Institute: ${applicant.education['Senior Secondary'].institute}</p>
+        <p>CGPA: ${applicant.education['Senior Secondary'].cgpa}</p>
+        
+        <h4>High School:</h4>
+        <p>Institute: ${applicant.education['High School'].institute}</p>
+        <p>CGPA: ${applicant.education['High School'].cgpa}</p>
+        
+        <h3>Achievements:</h3>
+        <ul>
+          ${applicant.achievements.Summary.map(achievement => `<li>${achievement}</li>`).join('')}
+        </ul>
+        
+        <h3>Interests:</h3>
+        <ul>
+          ${applicant.interests.hobbies.map(interest => `<li>${interest}</li>`).join('')}
+        </ul>
+
+        `;
+      }
+
+      prevBtn.addEventListener("click", function () {
+        if (currentApplicantIndex > 0) {
+          currentApplicantIndex--;
+          displayApplicant(currentApplicantIndex);
+        }
+      });
+
+      nextBtn.addEventListener("click", function () {
+        if (currentApplicantIndex < applicants.length - 1) {
+          currentApplicantIndex++;
+          displayApplicant(currentApplicantIndex);
+        }
+      });
+
+      searchBtn.addEventListener("click", function () {
+        const searchValue = searchInput.value.toLowerCase();
+        const filteredApplicants = applicants.filter(applicant =>
+          applicant.basics.AppliedFor.toLowerCase() === searchValue
+        );
+
+        if (filteredApplicants.length === 0) {
+          searchMessage.textContent = "Invalid search or No applications for this job";
+          resumeDetails.innerHTML = "";
+          prevBtn.style.display = "none";
+          nextBtn.style.display = "none";
+        } else {
+          searchMessage.textContent = "";
+          applicants = filteredApplicants;
+          currentApplicantIndex = 0;
+          displayApplicant(currentApplicantIndex);
+
+          if (filteredApplicants.length === 1) {
+            prevBtn.style.display = "none";
+            nextBtn.style.display = "none";
+          } else {
+            prevBtn.style.display = "block";
+            nextBtn.style.display = "block";
+          }
+        }
+      });
+
+      // Load applicant data from the JSON file
+      fetch("data.json")
+        .then(response => response.json())
+        .then(data => {
+          if (data && data.resume) {
+            applicants = data.resume;
+            displayApplicant(currentApplicantIndex);
+          }
+        })
+        .catch(error => console.error("Error loading JSON data:", error));
+    });
+  </script>
+</body>
+</html>
